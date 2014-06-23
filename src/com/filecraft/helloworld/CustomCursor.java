@@ -311,11 +311,12 @@ public class CustomCursor extends AbstractCursor {
 			}
 			break;
 		case VIEW:
-			ViewItem viewItem = ViewItem.values()[position];
 			if (ViewTable.COLUMN_VIEW_URI.equals(columnName)) {
-				return viewItem.uri;
+				Object[] childItems = GridItem.values()[position].childItems;
+				if (childItems != null && childItems.length == 1 && childItems[0] instanceof ViewItem) {
+					return ((ViewItem) childItems[0]).uri;
+				}
 			}
-			break;
 		default:
 			// NO-OP
 			break;
@@ -373,9 +374,11 @@ public class CustomCursor extends AbstractCursor {
 			}
 			break;
 		case VIEW:
-			ViewItem viewItem = ViewItem.values()[position];
 			if (ViewTable.COLUMN_VIEW_TYPE.equals(columnName)) {
-				return viewItem.type.code;
+				Object[] childItems = GridItem.values()[position].childItems;
+				if (childItems != null && childItems.length == 1 && childItems[0] instanceof ViewItem) {
+					return ((ViewItem) childItems[0]).type.code;
+				}
 			}
 		default:
 			// NO-OP
