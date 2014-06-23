@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FileCraft: Hello World</string>
+    <string name="hello_world">Hello world!</string>
+    
+    <string name="open_filecraft">Open FileCraft</string>
+    <string name="download_filecraft">Download FileCraft</string>
+    
+    <!-- List Items -->
+    <string name="list_custom_cursor_title_gallery">Gallery</string>
+    <string name="list_custom_cursor_subtext_gallery">Grid items open in a gallery</string>
+    <string name="list_custom_cursor_title_view_web">Web Links</string>
+    <string name="list_custom_cursor_subtext_view_web">Grid items open in a web view</string>
+    
+    <string name="list_media_store_images_title">MediaStore.Images Cursor</string>
+    <string name="list_media_store_images_subtext">Grid items are populated from a different ContentProvider</string>
+    
+    <!-- Grid Items -->
+    <string name="grid_gallery_1">Gallery 1</string>
+    <string name="grid_gallery_2">Gallery 2</string>
+    <string name="grid_gallery_web_views">Gallery: Images from Web</string>
+    <string name="grid_gallery_raster_vs_svgbasic">Gallery: Raster vs Svg Basic</string>
+    <string name="grid_web_google">Google</string>
+    <string name="grid_web_4chan">4chan</string>
+
+</resources>
