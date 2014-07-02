@@ -52,15 +52,13 @@ public class CustomCursor extends AbstractCursor {
 	private enum ListItem {
 		GRID_GALLERY(ListActionType.GRID, R.raw.gallery, ContentType.RASTER_IMAGE,
 				R.string.list_custom_cursor_title_gallery,
-				R.string.list_custom_cursor_subtext_gallery,
-				new GridItem[] {
-						GridItem.GALLERY_1, GridItem.GALLERY_2,
-						GridItem.GALLERY_WEB_VIEWS, GridItem.GALLERY_RASTER_VS_SVGBASIC }),
-		GRID_VIEW_WEB(ListActionType.GRID, R.raw.download, ContentType.RASTER_IMAGE,
+				R.string.list_custom_cursor_subtext_gallery),
+		GRID_VIEW_WEB(ListActionType.GRID, R.raw.web_svg, ContentType.SVG_BASIC,
 				R.string.list_custom_cursor_title_view_web,
-				R.string.list_custom_cursor_subtext_view_web,
-				new GridItem[] {
-						GridItem.VIEW_GOOGLE, GridItem.VIEW_4CHAN });
+				R.string.list_custom_cursor_subtext_view_web),
+		GRID_OPEN_OTHER_GRID(ListActionType.GRID, R.raw.download_svg, ContentType.SVG_BASIC,
+				R.string.list_custom_cursor_title_other_grid,
+				R.string.list_custom_cursor_subtext_other_grid);
 
 		/**
 		 * Type of action to perform on the list item when clicked.
@@ -79,26 +77,38 @@ public class CustomCursor extends AbstractCursor {
 		public final String name;
 		public final String subtext;
 
-		/**
-		 * Child items used by the list action.
-		 */
-		public final Object[] childItems;
-
 		private ListItem(ListActionType type, int fileRes, ContentType contentType,
-				int nameRes, int subtextRes, Object[] childItems) {
+				int nameRes, int subtextRes) {
 			this.type = type;
 			iconPath = fileRes == -1 ? "" : "android.resource://" + PACKAGE_NAME + "/" + fileRes;
-			//uriPath = "file://" + Environment.getExternalStorage() + "/some_image.png";
-			//uriPath = "https://www.google.com/favicon.ico";
+			//iconPath = "file://" + Environment.getExternalStorage() + "/some_image.png";
+			//iconPath = "https://www.google.com/favicon.ico";
 			this.contentType = contentType;
 			Resources resources = MyApplication.getAppContext().getResources();
 			name = nameRes == -1 ? "" : resources.getString(nameRes);
 			subtext = subtextRes == -1 ? "" : resources.getString(subtextRes);
-			this.childItems = childItems;
 		}
 	}
 
 	private enum GridItem {
+		GALLERY_WEB_VIEWS(R.raw.image, ContentType.RASTER_IMAGE,
+				R.string.grid_gallery_web_views, GridActionType.GALLERY,
+				new GalleryItem[] {
+						GalleryItem.GOOGLE_FAVICON, GalleryItem.GOOGLE_FAVICON,
+						GalleryItem.GOOGLE_FAVICON, GalleryItem.GOOGLE_FAVICON }),
+		VIEW_GOOGLE(R.raw.web, ContentType.RASTER_IMAGE,
+				R.string.grid_web_google, GridActionType.VIEW,
+				new ViewItem[] { ViewItem.WEB_GOOGLE }),
+		VIEW_4CHAN(R.raw.web_svg, ContentType.SVG_BASIC,
+				R.string.grid_web_4chan, GridActionType.VIEW,
+				new ViewItem[] { ViewItem.WEB_4CHAN }),
+		GALLERY_RASTER_VS_SVGBASIC(R.raw.image_svg, ContentType.SVG_BASIC,
+				R.string.grid_gallery_raster_vs_svgbasic, GridActionType.GALLERY,
+				new GalleryItem[] {
+						GalleryItem.GALLERY, GalleryItem.GALLERY_SVG,
+						GalleryItem.IMAGE, GalleryItem.IMAGE_SVG,
+						GalleryItem.WEB, GalleryItem.WEB_SVG,
+						GalleryItem.DOWNLOAD, GalleryItem.DOWNLOAD_SVG }),
 		GALLERY_1(R.raw.gallery, ContentType.RASTER_IMAGE,
 				R.string.grid_gallery_1, GridActionType.GALLERY,
 				new GalleryItem[] { GalleryItem.GALLERY,
@@ -108,24 +118,9 @@ public class CustomCursor extends AbstractCursor {
 				new GalleryItem[] { GalleryItem.GOOGLE_FAVICON,
 						GalleryItem.DOWNLOAD, GalleryItem.GOOGLE_FAVICON,
 						GalleryItem.DOWNLOAD, GalleryItem.GOOGLE_FAVICON }),
-		GALLERY_WEB_VIEWS(R.raw.image, ContentType.RASTER_IMAGE,
-				R.string.grid_gallery_web_views, GridActionType.GALLERY,
-				new GalleryItem[] {
-						GalleryItem.GOOGLE_FAVICON, GalleryItem.GOOGLE_FAVICON,
-						GalleryItem.GOOGLE_FAVICON, GalleryItem.GOOGLE_FAVICON }),
-		GALLERY_RASTER_VS_SVGBASIC(R.raw.image_svg, ContentType.SVG_BASIC,
-				R.string.grid_gallery_raster_vs_svgbasic, GridActionType.GALLERY,
-				new GalleryItem[] {
-						GalleryItem.GALLERY, GalleryItem.GALLERY_SVG,
-						GalleryItem.IMAGE, GalleryItem.IMAGE_SVG,
-						GalleryItem.WEB, GalleryItem.WEB_SVG,
-						GalleryItem.DOWNLOAD, GalleryItem.DOWNLOAD_SVG }),
-		VIEW_GOOGLE(R.raw.web, ContentType.RASTER_IMAGE,
-				R.string.grid_web_google, GridActionType.VIEW,
-				new ViewItem[] { ViewItem.WEB_GOOGLE }),
-		VIEW_4CHAN(R.raw.web, ContentType.RASTER_IMAGE,
-				R.string.grid_web_4chan, GridActionType.VIEW,
-				new ViewItem[] { ViewItem.WEB_4CHAN });
+		GRID(R.raw.download_svg, ContentType.SVG_BASIC,
+				R.string.grid_other_grid, GridActionType.GRID,
+				new Integer[] { 3 });
 
 		/**
 		 * Path and content type of the icon to display in the grid.
@@ -157,6 +152,33 @@ public class CustomCursor extends AbstractCursor {
 			Resources resources = MyApplication.getAppContext().getResources();
 			text = textRes == -1 ? "" : resources.getString(textRes);
 			this.actionType = actionType;
+			this.childItems = childItems;
+		}
+	}
+
+	/**
+	 * Groupings of grid items.
+	 * 
+	 * Grid items are paired 1 to 1 with ListItem when requesting which grouping to get after
+	 * clicking a list item. For example, ListItem.GRID_GALLERY will use GridItemGroup.GALLERY
+	 * because both have an ordinal of 0.
+	 */
+	private enum GridItemGroup {
+		GALLERY(new GridItem[] {
+				GridItem.GALLERY_1, GridItem.GALLERY_2,
+				GridItem.GALLERY_WEB_VIEWS, GridItem.GALLERY_RASTER_VS_SVGBASIC }),
+		VIEW_WEB(new GridItem[] {
+				GridItem.VIEW_GOOGLE, GridItem.VIEW_4CHAN }),
+		OPEN_OTHER_GRID(new GridItem[] {
+				GridItem.GRID, GridItem.GALLERY_1, GridItem.GALLERY_2,
+				GridItem.GALLERY_WEB_VIEWS, GridItem.GALLERY_RASTER_VS_SVGBASIC,
+				GridItem.VIEW_GOOGLE, GridItem.VIEW_4CHAN }),
+		OTHER_GRID(new GridItem[] {
+				GridItem.GALLERY_RASTER_VS_SVGBASIC, GridItem.VIEW_GOOGLE });
+
+		public final GridItem[] childItems;
+
+		private GridItemGroup(GridItem[] childItems) {
 			this.childItems = childItems;
 		}
 	}
@@ -206,7 +228,7 @@ public class CustomCursor extends AbstractCursor {
 
 	private final UriMatcherEntry _matcherEntry;
 	private final Uri _uri;
-	private int _id;
+	private int _id = -1;
 	private final String[] _projection;
 
 	public CustomCursor(Uri uri, String[] projection,
@@ -229,6 +251,9 @@ public class CustomCursor extends AbstractCursor {
 			case GALLERY_ITEM:
 				_id = Integer.parseInt(pathSegs.get(pathSegs.size() - 2));
 				break;
+			case VIEW:
+				_id = Integer.parseInt(pathSegs.get(pathSegs.size() - 1));
+				break;
 			default:
 				// NO-OP
 				break;
@@ -244,11 +269,11 @@ public class CustomCursor extends AbstractCursor {
 		case LIST:
 			return ListItem.values().length;
 		case GRID:
-			return ListItem.values()[_id].childItems.length;
+			return GridItemGroup.values()[_id].childItems.length;
 		case GALLERY:
 			return GridItem.values()[_id].childItems.length;
 		case VIEW:
-			return ViewItem.values().length;
+			return GridItem.values().length;
 		default:
 			return 0;
 		}
@@ -297,7 +322,7 @@ public class CustomCursor extends AbstractCursor {
 			}
 			break;
 		case GRID:
-			GridItem gridItem = (GridItem) ListItem.values()[_id].childItems[position];
+			GridItem gridItem = (GridItem) GridItemGroup.values()[_id].childItems[position];
 			if (FileCraftContract.COLUMN_CONTENT_PATH.equals(columnName)) {
 				return gridItem.iconPath;
 			} else if (GridTable.COLUMN_GRID_TEXT.equals(columnName)) {
@@ -312,7 +337,7 @@ public class CustomCursor extends AbstractCursor {
 			break;
 		case VIEW:
 			if (ViewTable.COLUMN_VIEW_URI.equals(columnName)) {
-				Object[] childItems = GridItem.values()[position].childItems;
+				Object[] childItems = GridItem.values()[_id].childItems;
 				if (childItems != null && childItems.length == 1 && childItems[0] instanceof ViewItem) {
 					return ((ViewItem) childItems[0]).uri;
 				}
@@ -352,17 +377,22 @@ public class CustomCursor extends AbstractCursor {
 			if (ListTable.COLUMN_LIST_ACTION_TYPE.equals(columnName)) {
 				return listItem.type.code;
 			} else if (ListTable.COLUMN_LIST_ACTION_ID.equals(columnName)) {
-				return position;
+				return listItem.ordinal();
 			} else if (FileCraftContract.COLUMN_CONTENT_TYPE.equals(columnName)) {
 				return listItem.contentType.code;
 			}
 			break;
 		case GRID:
-			GridItem gridItem = (GridItem) ListItem.values()[_id].childItems[position];
+			GridItem gridItem = (GridItem) GridItemGroup.values()[_id].childItems[position];
 			if (GridTable.COLUMN_GRID_ACTION_TYPE.equals(columnName)) {
 				return gridItem.actionType.code;
 			} else if (GridTable.COLUMN_GRID_ACTION_ID.equals(columnName)) {
-				return position;
+				// Use childItem[0] as an id if it is an integer
+				if (gridItem.childItems.length == 1 && gridItem.childItems[0] instanceof Integer) {
+					return (Integer) gridItem.childItems[0];
+				} else {
+					return gridItem.ordinal();
+				}
 			} else if (FileCraftContract.COLUMN_CONTENT_TYPE.equals(columnName)) {
 				return gridItem.contentType.code;
 			}
@@ -375,7 +405,7 @@ public class CustomCursor extends AbstractCursor {
 			break;
 		case VIEW:
 			if (ViewTable.COLUMN_VIEW_TYPE.equals(columnName)) {
-				Object[] childItems = GridItem.values()[position].childItems;
+				Object[] childItems = GridItem.values()[_id].childItems;
 				if (childItems != null && childItems.length == 1 && childItems[0] instanceof ViewItem) {
 					return ((ViewItem) childItems[0]).type.code;
 				}

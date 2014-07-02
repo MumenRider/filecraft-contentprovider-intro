@@ -62,8 +62,6 @@ public class CustomCursorProviderA extends ContentProvider {
 			return GalleryTable.GALLERY_ITEM_TYPE;
 		case VIEW:
 			return ViewTable.VIEW_TYPE;
-		case VIEW_ITEM:
-			return ViewTable.VIEW_ITEM_TYPE;
 		}
 		return null;
 	}

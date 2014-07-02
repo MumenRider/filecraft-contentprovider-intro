@@ -27,6 +27,15 @@ import android.provider.BaseColumns;
 /**
  * Contract to be used by any FileCraft ContentProviders.
  * 
+ * Supported request formats (query uri):
+ * content://<authority>/list
+ * content://<authority>/list/<position>
+ * content://<authority>/grid/<id>
+ * content://<authority>/grid/<id>/<position>
+ * content://<authority>/gallery/<id>
+ * content://<authority>/gallery/<id>/<position>
+ * content://<authority>/view/<id>
+ * 
  * @see http://developer.android.com/guide/topics/providers/content-provider-basics.html#ContractClasses
  */
 public class FileCraftContract implements BaseColumns {
@@ -221,7 +230,11 @@ public class FileCraftContract implements BaseColumns {
 			 * 
 			 * @see http://developer.android.com/reference/android/content/Intent.html#ACTION_VIEW
 			 */
-			VIEW(2);
+			VIEW(2),
+			/**
+			 * Opens a different grid.
+			 */
+			GRID(3);
 
 			public final int code;
 
@@ -325,9 +338,9 @@ public class FileCraftContract implements BaseColumns {
 			}
 		}
 
-		public static Uri getUri(String authority) {
+		public static Uri getUri(String authority, int id) {
 			Uri contentUri = Uri.parse("content://" + authority);
-			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME);
+			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME + "/" + id);
 			return tableUri;
 		}
 	}
@@ -345,8 +358,7 @@ public class FileCraftContract implements BaseColumns {
 		GALLERY(GalleryTable.TABLE_NAME + "/#", 360),
 		GALLERY_ITEM(GalleryTable.TABLE_NAME + "/#/#", 1337),
 
-		VIEW(ViewTable.TABLE_NAME, 8888),
-		VIEW_ITEM(ViewTable.TABLE_NAME + "/#", 404);
+		VIEW(ViewTable.TABLE_NAME + "/#", 404);
 
 		public final String path;
 		public final int tableId;
@@ -371,8 +383,6 @@ public class FileCraftContract implements BaseColumns {
 				return GALLERY_ITEM;
 			} else if (tableId == VIEW.tableId) {
 				return VIEW;
-			} else if (tableId == VIEW_ITEM.tableId) {
-				return VIEW_ITEM;
 			} else {
 				return null;
 			}
