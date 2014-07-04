@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">FileCraft: Hello World</string>
-    <string name="hello_world">Hello world!</string>
     
     <string name="open_filecraft">Open FileCraft</string>
     <string name="download_filecraft">Download FileCraft</string>
@@ -14,9 +13,6 @@
     <string name="list_custom_cursor_subtext_view_web">Grid items open in a web view</string>
     <string name="list_custom_cursor_title_other_grid">Sub-grid</string>
     <string name="list_custom_cursor_subtext_other_grid">One grid item opens another grid</string>
-    
-    <string name="list_media_store_images_title">MediaStore.Images Cursor</string>
-    <string name="list_media_store_images_subtext">Grid items are populated from a different ContentProvider</string>
     
     <!-- Grid Items -->
     <string name="grid_gallery_1">Gallery 1</string>
