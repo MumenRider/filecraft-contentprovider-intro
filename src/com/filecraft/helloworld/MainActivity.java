@@ -20,15 +20,18 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 package com.filecraft.helloworld;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class MainActivity extends Activity {
 
+	private static final String TAG = MainActivity.class.getClass().getSimpleName();
 	private static final String FILECRAFT_PACKAGE = "com.filecraft";
 
 	private Button _launchFileCraftButton = null;
@@ -44,13 +47,17 @@ public class MainActivity extends Activity {
 		_launchFileCraftButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = getPackageManager().getLaunchIntentForPackage(FILECRAFT_PACKAGE);
-				if (intent == null) {
-					intent = new Intent(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse("market://details?id=" + FILECRAFT_PACKAGE));
-					startActivity(intent);
-				} else {
-					startActivity(intent);
+				try {
+					Intent intent = getPackageManager().getLaunchIntentForPackage(FILECRAFT_PACKAGE);
+					if (intent == null) {
+						intent = new Intent(Intent.ACTION_VIEW);
+						intent.setData(Uri.parse("market://details?id=" + FILECRAFT_PACKAGE));
+						startActivity(intent);
+					} else {
+						startActivity(intent);
+					}
+				} catch (ActivityNotFoundException e) {
+					Log.e(TAG, "Failed to start activity", e);
 				}
 			}
 		});
