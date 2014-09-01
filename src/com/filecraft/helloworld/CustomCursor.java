@@ -19,217 +19,38 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 package com.filecraft.helloworld;
 
-import java.util.List;
-
-import android.content.res.Resources;
 import android.database.AbstractCursor;
 import android.net.Uri;
 
-import com.filecraft.helloworld.FileCraftContract.ContentType;
 import com.filecraft.helloworld.FileCraftContract.GridTable;
-import com.filecraft.helloworld.FileCraftContract.GridTable.GridActionType;
 import com.filecraft.helloworld.FileCraftContract.ListTable;
-import com.filecraft.helloworld.FileCraftContract.ListTable.ListActionType;
+import com.filecraft.helloworld.FileCraftContract.QuizAnswersTable;
+import com.filecraft.helloworld.FileCraftContract.QuizQuestionsTable;
+import com.filecraft.helloworld.FileCraftContract.QuizTable;
 import com.filecraft.helloworld.FileCraftContract.UriMatcherEntry;
 import com.filecraft.helloworld.FileCraftContract.ViewTable;
-import com.filecraft.helloworld.FileCraftContract.ViewTable.ViewType;
 
 /**
  * Custom cursor used by the ContentProvider. Does not use a sqlite database and all data is
- * static. A better Cursor might draw data from a sqlite database, from another ContentProvider
- * on the device, and/or from a remote server.
+ * static.
  * 
- * TODO: Make sample Cursors that draw data from a sqlite database, from another ContentProvider
- * on the device, and from a web site.
+ * TODO: Add example cursors that draw data from a sqlite database, from another ContentProvider
+ * on the device, from files packaged with the apk, and from a remote server.
  */
 public class CustomCursor extends AbstractCursor {
 
-	private static final String PACKAGE_NAME = MyApplication.getAppContext().getPackageName();
-
-	/**
-	 * Child items found within the left/start drawer view.
-	 */
-	private enum ListItem {
-		GRID_GALLERY(ListActionType.GRID, R.raw.gallery, ContentType.RASTER_IMAGE,
-				R.string.list_custom_cursor_title_gallery,
-				R.string.list_custom_cursor_subtext_gallery),
-		GRID_VIEW_WEB(ListActionType.GRID, R.raw.web_svg, ContentType.SVG_BASIC,
-				R.string.list_custom_cursor_title_view_web,
-				R.string.list_custom_cursor_subtext_view_web),
-		GRID_OPEN_OTHER_GRID(ListActionType.GRID, R.raw.download_svg, ContentType.SVG_BASIC,
-				R.string.list_custom_cursor_title_other_grid,
-				R.string.list_custom_cursor_subtext_other_grid);
-
-		/**
-		 * Type of action to perform on the list item when clicked.
-		 */
-		public final ListActionType type;
-
-		/**
-		 * Path and content type of the icon to display in the list.
-		 */
-		public final String iconPath;
-		public final ContentType contentType;
-
-		/**
-		 * Name/title text and subtext to display in the list item.
-		 */
-		public final String name;
-		public final String subtext;
-
-		private ListItem(ListActionType type, int fileRes, ContentType contentType,
-				int nameRes, int subtextRes) {
-			this.type = type;
-			iconPath = fileRes == -1 ? "" : "android.resource://" + PACKAGE_NAME + "/" + fileRes;
-			//iconPath = "file://" + Environment.getExternalStorage() + "/some_image.png";
-			//iconPath = "https://www.google.com/favicon.ico";
-			this.contentType = contentType;
-			Resources resources = MyApplication.getAppContext().getResources();
-			name = nameRes == -1 ? "" : resources.getString(nameRes);
-			subtext = subtextRes == -1 ? "" : resources.getString(subtextRes);
-		}
-	}
-
-	private enum GridItem {
-		GALLERY_WEB_VIEWS(R.raw.image, ContentType.RASTER_IMAGE,
-				R.string.grid_gallery_web_views, GridActionType.GALLERY,
-				new GalleryItem[] {
-						GalleryItem.GOOGLE_FAVICON, GalleryItem.GOOGLE_FAVICON,
-						GalleryItem.GOOGLE_FAVICON, GalleryItem.GOOGLE_FAVICON }),
-		VIEW_GOOGLE(R.raw.web, ContentType.RASTER_IMAGE,
-				R.string.grid_web_google, GridActionType.VIEW,
-				new ViewItem[] { ViewItem.WEB_GOOGLE }),
-		VIEW_4CHAN(R.raw.web_svg, ContentType.SVG_BASIC,
-				R.string.grid_web_4chan, GridActionType.VIEW,
-				new ViewItem[] { ViewItem.WEB_4CHAN }),
-		GALLERY_RASTER_VS_SVGBASIC(R.raw.image_svg, ContentType.SVG_BASIC,
-				R.string.grid_gallery_raster_vs_svgbasic, GridActionType.GALLERY,
-				new GalleryItem[] {
-						GalleryItem.GALLERY, GalleryItem.GALLERY_SVG,
-						GalleryItem.IMAGE, GalleryItem.IMAGE_SVG,
-						GalleryItem.WEB, GalleryItem.WEB_SVG,
-						GalleryItem.DOWNLOAD, GalleryItem.DOWNLOAD_SVG }),
-		GALLERY_1(R.raw.gallery, ContentType.RASTER_IMAGE,
-				R.string.grid_gallery_1, GridActionType.GALLERY,
-				new GalleryItem[] { GalleryItem.GALLERY,
-						GalleryItem.IMAGE, GalleryItem.GOOGLE_FAVICON }),
-		GALLERY_2(R.raw.gallery_svg, ContentType.SVG_BASIC,
-				R.string.grid_gallery_2, GridActionType.GALLERY,
-				new GalleryItem[] { GalleryItem.GOOGLE_FAVICON,
-						GalleryItem.DOWNLOAD, GalleryItem.GOOGLE_FAVICON,
-						GalleryItem.DOWNLOAD, GalleryItem.GOOGLE_FAVICON }),
-		GRID(R.raw.download_svg, ContentType.SVG_BASIC,
-				R.string.grid_other_grid, GridActionType.GRID,
-				new Integer[] { 3 });
-
-		/**
-		 * Path and content type of the icon to display in the grid.
-		 */
-		public final String iconPath;
-		public final ContentType contentType;
-
-		/**
-		 * Text to display under the icon in the grid.
-		 */
-		public final String text;
-
-		/**
-		 * Action performed when the grid item is clicked.
-		 */
-		public final GridActionType actionType;
-
-		/**
-		 * Child items used by the list action.
-		 */
-		public final Object[] childItems;
-
-		private GridItem(int fileRes, ContentType contentType, int textRes,
-				GridActionType actionType, Object[] childItems) {
-			iconPath = fileRes == -1 ? "" : "android.resource://" + PACKAGE_NAME + "/" + fileRes;
-			//uriPath = "file://" + Environment.getExternalStorage() + "/some_image.png";
-			//uriPath = "https://www.google.com/favicon.ico";
-			this.contentType = contentType;
-			Resources resources = MyApplication.getAppContext().getResources();
-			text = textRes == -1 ? "" : resources.getString(textRes);
-			this.actionType = actionType;
-			this.childItems = childItems;
-		}
-	}
-
-	/**
-	 * Groupings of grid items.
-	 * 
-	 * Grid items are paired 1 to 1 with ListItem when requesting which grouping to get after
-	 * clicking a list item. For example, ListItem.GRID_GALLERY will use GridItemGroup.GALLERY
-	 * because both have an ordinal of 0.
-	 */
-	private enum GridItemGroup {
-		GALLERY(new GridItem[] {
-				GridItem.GALLERY_1, GridItem.GALLERY_2,
-				GridItem.GALLERY_WEB_VIEWS, GridItem.GALLERY_RASTER_VS_SVGBASIC }),
-		VIEW_WEB(new GridItem[] {
-				GridItem.VIEW_GOOGLE, GridItem.VIEW_4CHAN }),
-		OPEN_OTHER_GRID(new GridItem[] {
-				GridItem.GRID, GridItem.GALLERY_1, GridItem.GALLERY_2,
-				GridItem.GALLERY_WEB_VIEWS, GridItem.GALLERY_RASTER_VS_SVGBASIC,
-				GridItem.VIEW_GOOGLE, GridItem.VIEW_4CHAN }),
-		OTHER_GRID(new GridItem[] {
-				GridItem.GALLERY_RASTER_VS_SVGBASIC, GridItem.VIEW_GOOGLE });
-
-		public final GridItem[] childItems;
-
-		private GridItemGroup(GridItem[] childItems) {
-			this.childItems = childItems;
-		}
-	}
-
-	private enum GalleryItem {
-		IMAGE("android.resource://" + PACKAGE_NAME + "/" + R.raw.image, ContentType.RASTER_IMAGE),
-		IMAGE_SVG("android.resource://" + PACKAGE_NAME + "/" + R.raw.image_svg, ContentType.SVG_BASIC),
-		GALLERY("android.resource://" + PACKAGE_NAME + "/" + R.raw.gallery, ContentType.RASTER_IMAGE),
-		GALLERY_SVG("android.resource://" + PACKAGE_NAME + "/" + R.raw.gallery_svg, ContentType.SVG_BASIC),
-		DOWNLOAD("android.resource://" + PACKAGE_NAME + "/" + R.raw.download, ContentType.RASTER_IMAGE),
-		DOWNLOAD_SVG("android.resource://" + PACKAGE_NAME + "/" + R.raw.download_svg, ContentType.SVG_BASIC),
-		WEB("android.resource://" + PACKAGE_NAME + "/" + R.raw.web, ContentType.RASTER_IMAGE),
-		WEB_SVG("android.resource://" + PACKAGE_NAME + "/" + R.raw.web_svg, ContentType.SVG_BASIC),
-		GOOGLE_FAVICON("https://www.google.com/favicon.ico", ContentType.WEB_IMAGE);
-
-		/**
-		 * Path and content type of a gallery page.
-		 */
-		public final String uri;
-		public final ContentType contentType;
-
-		private GalleryItem(String uri, ContentType contentType) {
-			this.uri = uri;
-			this.contentType = contentType;
-		}
-	}
-
-	private enum ViewItem {
-		WEB_GOOGLE("https://www.google.com/", ViewType.STANDARD),
-		WEB_4CHAN("http://www.4chan.org/", ViewType.STANDARD);
-
-		/**
-		 * Uri to VIEW
-		 */
-		public final String uri;
-
-		/**
-		 * Type of view action to perform.
-		 */
-		public final ViewType type;
-
-		private ViewItem(String uri, ViewType type) {
-			this.uri = uri;
-			this.type = type;
-		}
-	}
-
 	private final UriMatcherEntry _matcherEntry;
 	private final Uri _uri;
-	private int _id = -1;
+	private String _actionId;
 	private final String[] _projection;
+
+	private ListItem[] _listItems = null;
+	private GridItem[] _gridItems = null;
+	private GalleryItem[] _galleryItems = null;
+	private ViewItem _viewItem = null;
+	private Quiz _quiz = null;
+	private QuizQuestion[] _quizQuestions = null;
+	private QuizAnswer[] _quizAnswers = null;
 
 	public CustomCursor(Uri uri, String[] projection,
 			String selection, String[] selectionArgs, String sortOrder) {
@@ -241,24 +62,56 @@ public class CustomCursor extends AbstractCursor {
 			throw new IllegalArgumentException("Unknown table URI: " + uri);
 		}
 		try {
-			List<String> pathSegs = uri.getPathSegments();
 			switch (_matcherEntry) {
 			case GRID:
 			case GALLERY:
-				_id = Integer.parseInt(pathSegs.get(pathSegs.size() - 1));
-				break;
+			case VIEW:
+			case QUIZ:
+			case QUIZ_QUESTIONS:
+			case QUIZ_ANSWERS:
 			case GRID_ITEM:
 			case GALLERY_ITEM:
-				_id = Integer.parseInt(pathSegs.get(pathSegs.size() - 2));
+			case QUIZ_QUESTIONS_ITEM:
+			case QUIZ_ANSWERS_ITEM:
+				_actionId = selectionArgs[0];
+			default:
+				// NO-OP
+				break;
+			}
+			switch (_matcherEntry) {
+			case LIST:
+			case LIST_ITEM:
+				_listItems = new ListItem[ListItem.getListItemCount()];
+				break;
+			case GRID:
+			case GRID_ITEM:
+				_gridItems = new GridItem[GridItem.getGridItemCount(_actionId)];
+				break;
+			case GALLERY:
+			case GALLERY_ITEM:
+				_galleryItems = new GalleryItem[GalleryItem.getGalleryItemCount(_actionId)];
 				break;
 			case VIEW:
-				_id = Integer.parseInt(pathSegs.get(pathSegs.size() - 1));
+				_viewItem = ViewItem.getViewItem(_actionId);
+				break;
+			case QUIZ:
+				_quiz = Quiz.getQuiz(_actionId);
+				break;
+			case QUIZ_QUESTIONS:
+			case QUIZ_QUESTIONS_ITEM:
+				_quizQuestions = QuizQuestion.getQuizQuestions(_actionId, false);
+				break;
+			case QUIZ_ANSWERS:
+			case QUIZ_ANSWERS_ITEM:
+				_quizAnswers = QuizAnswer.getQuizAnswers(_actionId, true);
 				break;
 			default:
 				// NO-OP
 				break;
 			}
+
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new IllegalArgumentException("Failed to parse table URI: " + uri);
 		}
 	}
@@ -267,13 +120,19 @@ public class CustomCursor extends AbstractCursor {
 	public int getCount() {
 		switch (_matcherEntry) {
 		case LIST:
-			return ListItem.values().length;
+			return ListItem.getListItemCount();
 		case GRID:
-			return GridItemGroup.values()[_id].childItems.length;
+			return GridItem.getGridItemCount(_actionId);
 		case GALLERY:
-			return GridItem.values()[_id].childItems.length;
+			return GalleryItem.getGalleryItemCount(_actionId);
+		case QUIZ:
+			return 1;
+		case QUIZ_QUESTIONS:
+			return QuizQuestion.getQuizQuestionCount(_actionId);
+		case QUIZ_ANSWERS:
+			return _quizAnswers.length;
 		case VIEW:
-			return GridItem.values().length;
+			return 1;
 		default:
 			return 0;
 		}
@@ -289,11 +148,8 @@ public class CustomCursor extends AbstractCursor {
 		String columnName = getColumnName(column);
 		if (FileCraftContract.COLUMN_CONTENT_TYPE.equals(columnName) ||
 				FileCraftContract.COLUMN_VERSION.equals(columnName) ||
-				ListTable.COLUMN_LIST_ACTION_TYPE.equals(columnName) ||
-				ListTable.COLUMN_LIST_ACTION_ID.equals(columnName) ||
-				GridTable.COLUMN_GRID_ACTION_TYPE.equals(columnName) ||
-				GridTable.COLUMN_GRID_ACTION_ID.equals(columnName) ||
-				ViewTable.COLUMN_VIEW_TYPE.equals(columnName)) {
+				FileCraftContract.COLUMN_ACTION_TYPE.equals(columnName) ||
+				QuizAnswersTable.COLUMN_IS_CORRECT_ANSWER.equals(columnName)) {
 			return FIELD_TYPE_INTEGER;
 		} else {
 			return FIELD_TYPE_STRING;
@@ -312,36 +168,71 @@ public class CustomCursor extends AbstractCursor {
 		}
 		switch (_matcherEntry) {
 		case LIST:
-			ListItem listItem = ListItem.values()[position];
+			if (_listItems[position] == null) {
+				_listItems[position] = ListItem.getListItem(position);
+			}
 			if (FileCraftContract.COLUMN_CONTENT_PATH.equals(columnName)) {
-				return listItem.iconPath;
+				return _listItems[position].iconPath;
+			} else if (FileCraftContract.COLUMN_ACTION_ID.equals(columnName)) {
+				return _listItems[position].actionId;
 			} else if (ListTable.COLUMN_LIST_NAME.equals(columnName)) {
-				return listItem.name;
+				return _listItems[position].name;
 			} else if (ListTable.COLUMN_LIST_SUBTEXT.equals(columnName)) {
-				return listItem.subtext;
+				return _listItems[position].subtext;
 			}
 			break;
 		case GRID:
-			GridItem gridItem = (GridItem) GridItemGroup.values()[_id].childItems[position];
+			if (_gridItems[position] == null) {
+				_gridItems[position] = GridItem.getGridItem(_actionId, position);
+			}
 			if (FileCraftContract.COLUMN_CONTENT_PATH.equals(columnName)) {
-				return gridItem.iconPath;
+				return _gridItems[position].iconPath;
+			} else if (FileCraftContract.COLUMN_ACTION_ID.equals(columnName)) {
+				return _gridItems[position].actionId;
 			} else if (GridTable.COLUMN_GRID_TEXT.equals(columnName)) {
-				return gridItem.text;
+				return _gridItems[position].text;
 			}
 			break;
 		case GALLERY:
-			GalleryItem galleryItem = (GalleryItem) GridItem.values()[_id].childItems[position];
+			if (_galleryItems[position] == null) {
+				_galleryItems[position] = GalleryItem.getGalleryItem(_actionId, position);
+			}
 			if (FileCraftContract.COLUMN_CONTENT_PATH.equals(columnName)) {
-				return galleryItem.uri;
+				return _galleryItems[position].imagePath;
 			}
 			break;
 		case VIEW:
 			if (ViewTable.COLUMN_VIEW_URI.equals(columnName)) {
-				Object[] childItems = GridItem.values()[_id].childItems;
-				if (childItems != null && childItems.length == 1 && childItems[0] instanceof ViewItem) {
-					return ((ViewItem) childItems[0]).uri;
-				}
+				return _viewItem.uri;
 			}
+			break;
+		case QUIZ:
+			if (FileCraftContract.COLUMN_CONTENT_PATH.equals(columnName)) {
+				return _quiz.iconPath;
+			} else if (FileCraftContract.COLUMN_ACTION_ID.equals(columnName)) {
+				return _quiz.actionId;
+			} else if (QuizTable.COLUMN_DESCRIPTION.equals(columnName)) {
+				return _quiz.description;
+			} else if (QuizTable.COLUMN_TITLE.equals(columnName)) {
+				return _quiz.title;
+			}
+			break;
+		case QUIZ_QUESTIONS:
+			if (FileCraftContract.COLUMN_CONTENT_PATH.equals(columnName)) {
+				return _quizQuestions[position].iconPath;
+			} else if (FileCraftContract.COLUMN_ACTION_ID.equals(columnName)) {
+				return _quizQuestions[position].actionId;
+			} else if (QuizQuestionsTable.COLUMN_QUIZ_QUESTION.equals(columnName)) {
+				return _quizQuestions[position].question;
+			} else if (QuizQuestionsTable.COLUMN_QUIZ_SUBTEXT.equals(columnName)) {
+				return "";
+			}
+			break;
+		case QUIZ_ANSWERS:
+			if (QuizAnswersTable.COLUMN_ANSWER_TEXT.equals(columnName)) {
+				return _quizAnswers[position].answer;
+			}
+			break;
 		default:
 			// NO-OP
 			break;
@@ -373,43 +264,52 @@ public class CustomCursor extends AbstractCursor {
 		int position = getPosition();
 		switch (_matcherEntry) {
 		case LIST:
-			ListItem listItem = ListItem.values()[position];
-			if (ListTable.COLUMN_LIST_ACTION_TYPE.equals(columnName)) {
-				return listItem.type.code;
-			} else if (ListTable.COLUMN_LIST_ACTION_ID.equals(columnName)) {
-				return listItem.ordinal();
+			if (_listItems[position] == null) {
+				_listItems[position] = ListItem.getListItem(position);
+			}
+			if (FileCraftContract.COLUMN_ACTION_TYPE.equals(columnName)) {
+				return _listItems[position].type.code;
 			} else if (FileCraftContract.COLUMN_CONTENT_TYPE.equals(columnName)) {
-				return listItem.contentType.code;
+				return _listItems[position].iconType.code;
 			}
 			break;
 		case GRID:
-			GridItem gridItem = (GridItem) GridItemGroup.values()[_id].childItems[position];
-			if (GridTable.COLUMN_GRID_ACTION_TYPE.equals(columnName)) {
-				return gridItem.actionType.code;
-			} else if (GridTable.COLUMN_GRID_ACTION_ID.equals(columnName)) {
-				// Use childItem[0] as an id if it is an integer
-				if (gridItem.childItems.length == 1 && gridItem.childItems[0] instanceof Integer) {
-					return (Integer) gridItem.childItems[0];
-				} else {
-					return gridItem.ordinal();
-				}
+			if (_gridItems[position] == null) {
+				_gridItems[position] = GridItem.getGridItem(_actionId, position);
+			}
+			if (FileCraftContract.COLUMN_ACTION_TYPE.equals(columnName)) {
+				return _gridItems[position].actionType.code;
 			} else if (FileCraftContract.COLUMN_CONTENT_TYPE.equals(columnName)) {
-				return gridItem.contentType.code;
+				return _gridItems[position].iconType.code;
 			}
 			break;
 		case GALLERY:
-			GalleryItem galleryItem = (GalleryItem) GridItem.values()[_id].childItems[position];
+			if (_galleryItems[position] == null) {
+				_galleryItems[position] = GalleryItem.getGalleryItem(_actionId, position);
+			}
 			if (FileCraftContract.COLUMN_CONTENT_TYPE.equals(columnName)) {
-				return galleryItem.contentType.code;
+				return _galleryItems[position].imageType.code;
 			}
 			break;
 		case VIEW:
-			if (ViewTable.COLUMN_VIEW_TYPE.equals(columnName)) {
-				Object[] childItems = GridItem.values()[_id].childItems;
-				if (childItems != null && childItems.length == 1 && childItems[0] instanceof ViewItem) {
-					return ((ViewItem) childItems[0]).type.code;
-				}
+			if (FileCraftContract.COLUMN_ACTION_TYPE.equals(columnName)) {
+				return _viewItem.type.code;
 			}
+		case QUIZ:
+			if (FileCraftContract.COLUMN_CONTENT_TYPE.equals(columnName)) {
+				return _quiz.iconType.code;
+			}
+			break;
+		case QUIZ_QUESTIONS:
+			if (FileCraftContract.COLUMN_ACTION_TYPE.equals(columnName)) {
+				return QuizQuestionsTable.TYPE_MULTIPLE_CHOICE;
+			}
+			break;
+		case QUIZ_ANSWERS:
+			if (QuizAnswersTable.COLUMN_IS_CORRECT_ANSWER.equals(columnName)) {
+				return _quizAnswers[position].isCorrect ? 1 : 0;
+			}
+			break;
 		default:
 			// NO-OP
 			break;

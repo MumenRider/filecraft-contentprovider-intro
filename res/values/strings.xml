@@ -2,25 +2,28 @@
 <resources>
 
     <string name="app_name">FileCraft: Hello World</string>
-    
+
     <string name="open_filecraft">Open FileCraft</string>
     <string name="download_filecraft">Download FileCraft</string>
-    
-    <!-- List Items -->
-    <string name="list_custom_cursor_title_gallery">Gallery</string>
-    <string name="list_custom_cursor_subtext_gallery">Grid items open in a gallery</string>
-    <string name="list_custom_cursor_title_view_web">Web Links</string>
-    <string name="list_custom_cursor_subtext_view_web">Grid items open in a web view</string>
-    <string name="list_custom_cursor_title_other_grid">Sub-grid</string>
-    <string name="list_custom_cursor_subtext_other_grid">One grid item opens another grid</string>
-    
-    <!-- Grid Items -->
-    <string name="grid_gallery_1">Gallery 1</string>
-    <string name="grid_gallery_2">Gallery 2</string>
-    <string name="grid_gallery_web_views">Gallery: Images from Web</string>
-    <string name="grid_gallery_raster_vs_svgbasic">Gallery: Raster vs Svg Basic</string>
-    <string name="grid_web_google">Google</string>
-    <string name="grid_web_4chan">4chan</string>
-    <string name="grid_other_grid">Open Other Grid</string>
+
+    <!-- ContentProvider -->
+    <string name="contentprovider_tutorial_title">Tutorial</string>
+    <string name="contentprovider_tutorial_subtext">HowTo Build Your Own FileCraft Plugin App</string>
+    <string name="contentprovider_grid_github_title">Example App on GitHub</string>
+    <string name="contentprovider_grid_android_title">Build Your First Android App</string>
+    <string name="contentprovider_grid_documentation_title">Read About ContentProviders</string>
+    <string name="contentprovider_examples_title">Examples</string>
+    <string name="contentprovider_examples_subtext">Examples of what you can build through a content provider.</string>
+    <string name="contentprovider_grid_nested_grid">Go to nested grid</string>
+    <string name="contentprovider_grid_nested_grid_return">Return to previous grid</string>
+    <string name="contentprovider_grid_gallery_all">Gallery: SVG, PNG, and web image</string>
+    <string name="contentprovider_grid_gallery_svg">Gallery: SVG basic</string>
+    <string name="contentprovider_grid_gallery_png">Gallery: PNG</string>
+    <string name="contentprovider_grid_gallery_web">Gallery: Web image</string>
+    <string name="contentprovider_grid_link_google_play">Google Play Web Link</string>
+    <string name="contentprovider_grid_link_github">GitHub Web Link</string>
+    <string name="contentprovider_grid_quiz_japanese_vocab">Quiz: Misc Japanese Vocab</string>
+    <string name="contentprovider_grid_quiz_japanese_basics">Quiz: Basic Japanese Sentences</string>
+    <string name="contentprovider_grid_quiz_subtext">Multiple choice. Select the correct translation.</string>
 
 </resources>

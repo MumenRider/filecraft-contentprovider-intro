@@ -30,11 +30,16 @@ import android.provider.BaseColumns;
  * Supported request formats (query uri):
  * content://<authority>/list
  * content://<authority>/list/<position>
- * content://<authority>/grid/<id>
- * content://<authority>/grid/<id>/<position>
- * content://<authority>/gallery/<id>
- * content://<authority>/gallery/<id>/<position>
- * content://<authority>/view/<id>
+ * content://<authority>/grid
+ * content://<authority>/grid<position>
+ * content://<authority>/gallery
+ * content://<authority>/gallery/<position>
+ * content://<authority>/view
+ * content://<authority>/quiz
+ * content://<authority>/quiz_questions
+ * content://<authority>/quiz_questions/<position>
+ * content://<authority>/quiz_answers
+ * content://<authority>/quiz_answers/<position>
  * 
  * @see http://developer.android.com/guide/topics/providers/content-provider-basics.html#ContractClasses
  */
@@ -79,10 +84,22 @@ public class FileCraftContract implements BaseColumns {
 	public static final String COLUMN_CONTENT_TYPE = "content_type";
 
 	/**
-	 * Type = Int
+	 * Type = Integer (type code)
+	 * Type of action being performed. Usually when clicking a list or grid item.
+	 */
+	public static final String COLUMN_ACTION_TYPE = "action_type";
+
+	/**
+	 * Type = String (foreign key id)
+	 * Id of the action being activated. Used as a foreign key to the action table.
+	 */
+	public static final String COLUMN_ACTION_ID = "action_id";
+
+	/**
+	 * Type = Integer
 	 * Version code returned from queries. Initial version is 0.
 	 */
-	public static final String COLUMN_VERSION = "version"; // Type = Int
+	public static final String COLUMN_VERSION = "version";
 
 	/**
 	 * Content type used along with the "content_type" column. The "content_type" column should
@@ -146,19 +163,6 @@ public class FileCraftContract implements BaseColumns {
 		public static final String COLUMN_LIST_NAME = "list_name";
 		public static final String COLUMN_LIST_SUBTEXT = "list_subtext";
 
-		/**
-		 * Type = Integer (type id)
-		 * Action code from the ListActionType enum.
-		 */
-		public static final String COLUMN_LIST_ACTION_TYPE = "list_action_type";
-
-		/**
-		 * Type = Integer (foreign key)
-		 * Identifier for the action item. Clicking the list item will use the action type and action
-		 * id to determine which item to request.
-		 */
-		public static final String COLUMN_LIST_ACTION_ID = "list_action_id";
-
 		public static final String LIST_TYPE =
 				ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.com.filecraft.list";
 		public static final String LIST_ITEM_TYPE =
@@ -198,19 +202,6 @@ public class FileCraftContract implements BaseColumns {
 
 		public static final String COLUMN_GRID_TEXT = "grid_text"; // Type = String
 
-		/**
-		 * Type = Integer (type id)
-		 * Action code from the GridActionType enum.
-		 */
-		public static final String COLUMN_GRID_ACTION_TYPE = "grid_action_type";
-
-		/**
-		 * Type = Integer (foreign key)
-		 * Identifier for the action item. Clicking the grid item will use the action type and action
-		 * id to determine which item to request.
-		 */
-		public static final String COLUMN_GRID_ACTION_ID = "grid_action_id";
-
 		public static final String GRID_TYPE =
 				ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.com.filecraft.grid";
 		public static final String GRID_ITEM_TYPE =
@@ -234,7 +225,11 @@ public class FileCraftContract implements BaseColumns {
 			/**
 			 * Opens a different grid.
 			 */
-			GRID(3);
+			GRID(3),
+			/**
+			 * Starts a quiz.
+			 */
+			QUIZ(4);
 
 			public final int code;
 
@@ -252,10 +247,10 @@ public class FileCraftContract implements BaseColumns {
 			}
 		}
 
-		public static Uri getUri(String authority, int id) {
+		public static Uri getUri(String authority) {
 			Uri contentUri = Uri.parse("content://" + authority);
 			Uri tableUri = Uri.withAppendedPath(contentUri,
-					GridTable.TABLE_NAME + "/" + id);
+					GridTable.TABLE_NAME);
 			return tableUri;
 		}
 	}
@@ -290,9 +285,9 @@ public class FileCraftContract implements BaseColumns {
 			}
 		}
 
-		public static Uri getUri(String authority, int id) {
+		public static Uri getUri(String authority) {
 			Uri contentUri = Uri.parse("content://" + authority);
-			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME + "/" + id);
+			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME);
 			return tableUri;
 		}
 	}
@@ -305,7 +300,6 @@ public class FileCraftContract implements BaseColumns {
 	public static final class ViewTable {
 		public static final String TABLE_NAME = "view";
 
-		public static final String COLUMN_VIEW_TYPE = "view_type"; // Type = Integer (type id)
 		public static final String COLUMN_VIEW_URI = "view_uri"; // Type = String (uri)
 
 		public static final String VIEW_TYPE =
@@ -338,9 +332,85 @@ public class FileCraftContract implements BaseColumns {
 			}
 		}
 
-		public static Uri getUri(String authority, int id) {
+		public static Uri getUri(String authority) {
 			Uri contentUri = Uri.parse("content://" + authority);
-			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME + "/" + id);
+			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME);
+			return tableUri;
+		}
+	}
+
+	/**
+	 * Table for a quizzes. Quizzes have a one-to-many relationship with quiz questions.
+	 */
+	public static final class QuizTable {
+		public static final String TABLE_NAME = "quiz";
+
+		// Quiz details to be displayed in the Gravity.END slide out drawer
+		public static final String COLUMN_TITLE = "title";
+		public static final String COLUMN_DESCRIPTION = "description";
+		// + image path and image type columns
+
+		public static final String QUIZ_TYPE =
+				ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.com.filecraft.quiz";
+		public static final String QUIZ_ITEM_TYPE =
+				ContentResolver.CURSOR_ITEM_BASE_TYPE + "/vnd.com.filecraft.quiz";
+
+		public static Uri getUri(String authority) {
+			Uri contentUri = Uri.parse("content://" + authority);
+			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME);
+			return tableUri;
+		}
+	}
+
+	/**
+	 * Table for quiz questions. Quiz questions have a one-to-many relationship with quiz answers.
+	 */
+	public static final class QuizQuestionsTable {
+		public static final String TABLE_NAME = "quiz_questions";
+
+		// Multiple choice quiz columns
+		public static final String COLUMN_QUIZ_QUESTION = "question"; // Type = String
+		public static final String COLUMN_QUIZ_SUBTEXT = "subtext"; // Type = String
+
+		public static final String QUIZ_QUESTIONS_TYPE =
+				ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.com.filecraft.quiz.questions";
+		public static final String QUIZ_QUESTIONS_ITEM_TYPE =
+				ContentResolver.CURSOR_ITEM_BASE_TYPE + "/vnd.com.filecraft.quiz.questions";
+
+		/**
+		 * Question types. Defines how a question will display and what columns will be used.
+		 */
+		public static int TYPE_MULTIPLE_CHOICE = 1;
+
+		public static Uri getUri(String authority) {
+			Uri contentUri = Uri.parse("content://" + authority);
+			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME);
+			return tableUri;
+		}
+	}
+
+	/**
+	 * Table for quiz answers.
+	 */
+	public static final class QuizAnswersTable {
+		public static final String TABLE_NAME = "quiz_answers";
+
+		public static final String COLUMN_ANSWER_TEXT = "answer"; // Type = String
+		public static final String COLUMN_IS_CORRECT_ANSWER = "is_correct_answer"; // Type = Integer (true=1, false=0)
+
+		public static final String QUIZ_ANSWERS_TYPE =
+				ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.com.filecraft.quiz.answers";
+		public static final String QUIZ_ANSWERS_ITEM_TYPE =
+				ContentResolver.CURSOR_ITEM_BASE_TYPE + "/vnd.com.filecraft.quiz.answers";
+
+		/**
+		 * Display only text in the quiz answer
+		 */
+		public static int TYPE_TEXT_ONLY = 1;
+
+		public static Uri getUri(String authority) {
+			Uri contentUri = Uri.parse("content://" + authority);
+			Uri tableUri = Uri.withAppendedPath(contentUri, TABLE_NAME);
 			return tableUri;
 		}
 	}
@@ -352,13 +422,21 @@ public class FileCraftContract implements BaseColumns {
 		LIST(ListTable.TABLE_NAME, 42),
 		LIST_ITEM(ListTable.TABLE_NAME + "/#", 314),
 
-		GRID(GridTable.TABLE_NAME + "/#", 9000),
-		GRID_ITEM(GridTable.TABLE_NAME + "/#/#", 13),
+		GRID(GridTable.TABLE_NAME, 9000),
+		GRID_ITEM(GridTable.TABLE_NAME + "/#", 13),
 
-		GALLERY(GalleryTable.TABLE_NAME + "/#", 360),
-		GALLERY_ITEM(GalleryTable.TABLE_NAME + "/#/#", 1337),
+		GALLERY(GalleryTable.TABLE_NAME, 360),
+		GALLERY_ITEM(GalleryTable.TABLE_NAME + "/#", 1337),
 
-		VIEW(ViewTable.TABLE_NAME + "/#", 404);
+		VIEW(ViewTable.TABLE_NAME, 404),
+
+		QUIZ(QuizTable.TABLE_NAME, 1),
+
+		QUIZ_QUESTIONS(QuizQuestionsTable.TABLE_NAME, 10),
+		QUIZ_QUESTIONS_ITEM(QuizQuestionsTable.TABLE_NAME + "/#", 11),
+
+		QUIZ_ANSWERS(QuizAnswersTable.TABLE_NAME, 100),
+		QUIZ_ANSWERS_ITEM(QuizAnswersTable.TABLE_NAME + "/#", 101);
 
 		public final String path;
 		public final int tableId;
@@ -383,6 +461,16 @@ public class FileCraftContract implements BaseColumns {
 				return GALLERY_ITEM;
 			} else if (tableId == VIEW.tableId) {
 				return VIEW;
+			} else if (tableId == QUIZ.tableId) {
+				return QUIZ;
+			} else if (tableId == QUIZ_QUESTIONS.tableId) {
+				return QUIZ_QUESTIONS;
+			} else if (tableId == QUIZ_QUESTIONS_ITEM.tableId) {
+				return QUIZ_QUESTIONS_ITEM;
+			} else if (tableId == QUIZ_ANSWERS.tableId) {
+				return QUIZ_ANSWERS;
+			} else if (tableId == QUIZ_ANSWERS_ITEM.tableId) {
+				return QUIZ_ANSWERS_ITEM;
 			} else {
 				return null;
 			}
