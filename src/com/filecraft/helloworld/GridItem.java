@@ -10,7 +10,10 @@ public class GridItem {
 
 	public enum GridItemId {
 		INTRO(3, true),
-		SAMPLES(9, true),
+		SAMPLES(10, true),
+
+		// TODO: All shown items must be above this line. To fix this, consider fixing ListItem.getListItem
+		// to no longer use the list item position as the index of the GridItemId.
 		NESTED_GRID(1, false);
 
 		public final int itemCount;
@@ -122,6 +125,10 @@ public class GridItem {
 				return new GridItem(TutorialUtils.getResourceFilePath(R.raw.gallery_svg), ContentType.SVG_BASIC,
 						TutorialUtils.getString(R.string.contentprovider_grid_gallery_png),
 						GridActionType.GALLERY, GalleryItemId.PNG_ONLY.name());
+			case 9:
+				return new GridItem(TutorialUtils.getResourceFilePath(R.raw.gallery_svg), ContentType.SVG_BASIC,
+						TutorialUtils.getString(R.string.contentprovider_grid_gallery_split),
+						GridActionType.GALLERY, GalleryItemId.IMAGE_TEXT_MIX.name());
 			}
 			break;
 		case NESTED_GRID:

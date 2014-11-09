@@ -22,7 +22,6 @@ package com.filecraft.helloworld;
 import android.database.AbstractCursor;
 import android.net.Uri;
 
-import com.filecraft.helloworld.FileCraftContract.GridTable;
 import com.filecraft.helloworld.FileCraftContract.ListTable;
 import com.filecraft.helloworld.FileCraftContract.QuizAnswersTable;
 import com.filecraft.helloworld.FileCraftContract.QuizQuestionsTable;
@@ -189,7 +188,7 @@ public class CustomCursor extends AbstractCursor {
 				return _gridItems[position].iconPath;
 			} else if (FileCraftContract.COLUMN_ACTION_ID.equals(columnName)) {
 				return _gridItems[position].actionId;
-			} else if (GridTable.COLUMN_GRID_TEXT.equals(columnName)) {
+			} else if (FileCraftContract.COLUMN_TEXT.equals(columnName)) {
 				return _gridItems[position].text;
 			}
 			break;
@@ -199,6 +198,8 @@ public class CustomCursor extends AbstractCursor {
 			}
 			if (FileCraftContract.COLUMN_CONTENT_PATH.equals(columnName)) {
 				return _galleryItems[position].imagePath;
+			} else if (FileCraftContract.COLUMN_TEXT.equals(columnName)) {
+				return _galleryItems[position].text;
 			}
 			break;
 		case VIEW:

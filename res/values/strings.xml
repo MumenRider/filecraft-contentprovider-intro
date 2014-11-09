@@ -20,10 +20,17 @@
     <string name="contentprovider_grid_gallery_svg">Gallery: SVG basic</string>
     <string name="contentprovider_grid_gallery_png">Gallery: PNG</string>
     <string name="contentprovider_grid_gallery_web">Gallery: Web image</string>
+    <string name="contentprovider_grid_gallery_split">Gallery: Image and Text</string>
     <string name="contentprovider_grid_link_google_play">Google Play Web Link</string>
     <string name="contentprovider_grid_link_github">GitHub Web Link</string>
     <string name="contentprovider_grid_quiz_japanese_vocab">Quiz: Misc Japanese Vocab</string>
     <string name="contentprovider_grid_quiz_japanese_basics">Quiz: Basic Japanese Sentences</string>
     <string name="contentprovider_grid_quiz_subtext">Multiple choice. Select the correct translation.</string>
+    <string name="contentprovider_gallery_split_text">
+&lt;b&gt;Feature Description:&lt;/b&gt;
+&lt;li&gt;Screen is divided evenly between an image and text.
+&lt;li&gt;Text becomes scrollable if it will not fit on the screen.
+&lt;li&gt;Some html formatting is supported. Check Android\'s Html.fromHtml() documentation for information on what should work.
+</string>
 
 </resources>

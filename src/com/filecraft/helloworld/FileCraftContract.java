@@ -84,6 +84,12 @@ public class FileCraftContract implements BaseColumns {
 	public static final String COLUMN_CONTENT_TYPE = "content_type";
 
 	/**
+	 * Type = String (text to display)
+	 * Assuming the content displays a single area of text, this column may be used.
+	 */
+	public static final String COLUMN_TEXT = "text";
+
+	/**
 	 * Type = Integer (type code)
 	 * Type of action being performed. Usually when clicking a list or grid item.
 	 */
@@ -200,8 +206,6 @@ public class FileCraftContract implements BaseColumns {
 	public static final class GridTable {
 		public static final String TABLE_NAME = "grid";
 
-		public static final String COLUMN_GRID_TEXT = "grid_text"; // Type = String
-
 		public static final String GRID_TYPE =
 				ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.com.filecraft.grid";
 		public static final String GRID_ITEM_TYPE =
@@ -276,7 +280,13 @@ public class FileCraftContract implements BaseColumns {
 			/**
 			 * Display images with no other information.
 			 */
-			IMAGE_ONLY(1);
+			IMAGE_ONLY(1),
+			/**
+			 * Displays an image with text. The text will consume up to half of the screen size.
+			 * In landscape, the text will be to the right of the image. In portrait, the text will be
+			 * underneath the image.
+			 */
+			IMAGE_AND_SUBTEXT(2);
 
 			public final int code;
 
